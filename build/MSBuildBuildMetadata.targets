@@ -69,11 +69,11 @@
       <LanguageExt Condition="'$(Language)' == 'VB'">.vb</LanguageExt>
       <CodeGenLanguage Condition="'$(Language)' == 'C#'">C#</CodeGenLanguage>
       <CodeGenLanguage Condition="'$(Language)' == 'VB'">VisualBasic</CodeGenLanguage>
-      <MSBuildGitHashAssemblyInfoFile>$(IntermediateOutputPath)MSBuildGitHashAssemblyInfo$(LanguageExt)</MSBuildGitHashAssemblyInfoFile>
+      <MSBuildBuildMetadataAssemblyInfo>$(IntermediateOutputPath)MSBuildBuildMetadataAssemblyInfo$(LanguageExt)</MSBuildBuildMetadataAssemblyInfo>
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Include="$(MSBuildGitHashAssemblyInfoFile)" />
+      <Compile Include="$(MSBuildBuildMetadataAssemblyInfo)" />
     </ItemGroup>
 
     <ItemGroup>
@@ -82,13 +82,18 @@
         <_Parameter2>$(MSBuildGitHashValue)</_Parameter2>
       </AssemblyAttributes>
 
+	  <AssemblyAttributes Include="AssemblyMetadata">
+        <_Parameter1>BuildVersion</_Parameter1>
+        <_Parameter2>$(MajorVersion).$(MinorVersion).$(PatchVersion)</_Parameter2>
+      </AssemblyAttributes>
+	  
       <AssemblyAttributes Include="AssemblyMetadata" Condition="'$(MSBuildGitRepository)' != ''">
         <_Parameter1>GitRepository</_Parameter1>
         <_Parameter2>$(MSBuildGitRepository)</_Parameter2>
       </AssemblyAttributes>
     </ItemGroup>
 
-    <WriteCodeFragment Language="$(CodeGenLanguage)" OutputFile="$(MSBuildGitHashAssemblyInfoFile)" AssemblyAttributes="@(AssemblyAttributes)" />
+    <WriteCodeFragment Language="$(CodeGenLanguage)" OutputFile="$(MSBuildBuildMetadataAssemblyInfo)" AssemblyAttributes="@(AssemblyAttributes)" />
 
   </Target>
 </Project>
