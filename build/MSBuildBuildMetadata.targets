@@ -5,6 +5,7 @@
       <MSBuildGitHashVersionFile>$(IntermediateOutputPath)gitversion</MSBuildGitHashVersionFile>
       <MSBuildGitHashRemoteFile>$(IntermediateOutputPath)gitremote</MSBuildGitHashRemoteFile>
       <MSBuildGitHashRemoteCommand>git remote get-url $(MSBuildGitHashRemote)</MSBuildGitHashRemoteCommand>
+      <MSBuildGitHashCommand>git log -1 --pretty=tformat:%%H</MSBuildGitHashCommand>
       <MSBuildGitRepository 
         Condition="'$(MSBuildGitRepository)' == '' And '$(RepositoryType)' == 'git' And '$(RepositoryUrl)' != ''"
       >$(RepositoryUrl)</MSBuildGitRepository>
@@ -18,7 +19,7 @@
     </Exec>
 
     <Error 
-      Condition="'$(MSBuildGitHashValidate)' == 'True' And '$(MSBuildGitHashExitCode)' != '0'" 
+      Condition="'$(MSBuildGitHashExitCode)' != '0'" 
       Text="MSBuildGitHash error executing command $(MSBuildGitHashCommand) returned error code $(MSBuildGitHashExitCode)"
     />
 
@@ -31,7 +32,7 @@
     </Exec>
 
     <Error 
-      Condition="'$(MSBuildGitHashValidate)' == 'True' And '$(MSBuildGitHashRemote)' != '' And '$(MSBuildGitRemoteExitCode)' != '0'" 
+      Condition="'$(MSBuildGitHashRemote)' != '' And '$(MSBuildGitRemoteExitCode)' != '0'" 
       Text="MSBuildGitHash error executing command $(MSBuildGitHashRemoteCommand) returned error code $(MSBuildGitRemoteExitCode)"
     />
 
@@ -49,17 +50,7 @@
     <PropertyGroup>
       <MSBuildGitHashValue Condition="'$(MSBuildGitHashValue)' == ''">@(GitVersion)</MSBuildGitHashValue>
       <MSBuildGitRepository Condition="'$(MSBuildGitRepository)' == ''">@(GitRemote)</MSBuildGitRepository>
-      <MSBuildGitHashValueLength>$(MSBuildGitHashValue.Length)</MSBuildGitHashValueLength>
-      <MSBuildGitHashValueStart Condition="$(MSBuildGitHashValue.Length) &lt;= 32">$(MSBuildGitHashValue)</MSBuildGitHashValueStart>
-      <MSBuildGitHashValueStart Condition="$(MSBuildGitHashValue.Length) &gt; 32">$(MSBuildGitHashValue.Substring(0,32))</MSBuildGitHashValueStart>
-      <MSBuildGitHashRegexMatch>$([System.Text.RegularExpressions.Regex]::IsMatch($(MSBuildGitHashValue), $(MSBuildGitHashValidateRegex)))</MSBuildGitHashRegexMatch>
     </PropertyGroup>
-
-    <Error 
-      Condition="'$(MSBuildGitHashValidate)' == 'True' And ($(MSBuildGitHashValueLength) &gt; $(MSBuildGitHashValidateLength) Or '$(MSBuildGitHashRegexMatch)' != 'True')" 
-      Text="MSBuildGitHash hash value starting with '$(MSBuildGitHashValueStart)' was invalid." 
-    />
-
   </Target>
 
   <Target Name="WriteGitHash" BeforeTargets="CoreCompile">
